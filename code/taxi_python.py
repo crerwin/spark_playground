@@ -1,4 +1,6 @@
-import sys, time
+import sys
+import time
+
 
 def main(filename, command):
     if command == "total_passengers":
@@ -10,8 +12,24 @@ def main(filename, command):
     elif command == "trip_count":
         print("getting total trip count...")
         trip_count(filename)
+    elif command == "list_vendor_ids":
+        print("listing vendor ids...")
+        list_vendor_ids(filename)
     else:
-        print("no command or invalid command specified")
+        print("invalid command specified: " + command)
+
+
+def list_vendor_ids(filename):
+    with open(filename) as f:
+        next(f)
+        next(f)
+        vendorids = []
+        for line in f:
+            fields = line.split(',')
+            if fields[0] not in vendorids:
+                vendorids.append(fields[0])
+        print(vendorids)
+
 
 def trip_count(filename):
     with open(filename) as f:
@@ -22,6 +40,7 @@ def trip_count(filename):
             rowcount += 1
         print(rowcount)
 
+
 def total_passengers(filename):
     with open(filename) as f:
         next(f)
@@ -31,6 +50,7 @@ def total_passengers(filename):
             fields = line.split(',')
             totalpassengers += int(fields[3])
         print(totalpassengers)
+
 
 def average_passenger_count(filename):
     with open(filename) as f:
@@ -43,6 +63,7 @@ def average_passenger_count(filename):
             totalpassengers += int(fields[3])
             rowcount += 1
         print(totalpassengers/float(rowcount))
+
 
 if __name__ == "__main__":
     start_time = time.time()
