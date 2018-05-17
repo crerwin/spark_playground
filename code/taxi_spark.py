@@ -19,8 +19,28 @@ def main(sc, filename, command):
     elif command == "list_vendor_ids":
         print("listing vendor ids...")
         list_vendor_ids(sc, filename)
+    elif command == "revenue_by_vendor":
+        print("listing revenue by vendor...")
+        revenue_by_vendor(sc, filename)
+    elif command == "slow_join":
+        slow_join(sc, filename)
     else:
         print("no command or invalid command specified")
+
+
+def slow_join(sc, filename):
+    sqlcontext = SQLContext(sc)
+    df = sqlcontext.read.load(filename, format="csv", sep=",", inferSchema="true", header="true")
+    bdzdf = sqlcontext.read.load("data/taxi_zone_lookup.csv", format="csv", sep=",", inferSchema="true", header="true")
+    trips_over_five_miles = df.where(df.trip_distance.cast('float') > 5.0)
+    vendors = trips_over_five_miles.groupBy(df.VendorID).agg(F.sum(df.passenger_count).alias("passenger_count")).orderBy("passenger_count")
+    print(vendors.collect())
+
+def revenue_by_vendor(sc, filename):
+    sqlcontext = SQLContext(sc)
+    df = sqlcontext.read.load(filename, format="csv", sep=",", inferSchema="true", header="true")
+    revenues = df.groupBy(df.VendorID).agg(F.sum(df.total_amount))
+    print(revenues.show())
 
 
 def list_vendor_ids(sc, filename):

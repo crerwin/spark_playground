@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    hostname: postgres
+    environment:
+      POSTGRES_PASSWORD: pw
+    volumes:
+      - ./data:/tmp/data
+      - ./code:/tmp/code
+
+  psql:
+    image: postgres
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    volumes:
+      - ./data:/tmp/data
+      - ./code:/tmp/code

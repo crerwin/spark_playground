@@ -45,19 +45,20 @@ def slow_join(filename):
         for line in content:
             fields = line.rstrip().split(',')
             vendorid = fields[0]
-            passenger_count = float(fields[4])
-            trip_distance = float(fields[5])
+            passenger_count = float(fields[3])
+            trip_distance = float(fields[4])
             if trip_distance > 5.0:
                 if vendorid not in vendors:
                     vendors[vendorid] = passenger_count
                 else:
                     vendors[vendorid] += passenger_count
-            vendor_with_fewer = 0
-            fewest = 0
-            for key in vendors:
-                if fewest == 0 or vendors[key] < fewest:
-                    fewest = vendors[key]
-                    vendor_with_fewer = key
+        vendor_with_fewer = 0
+        fewest = 0
+        for key in vendors:
+            if fewest == 0 or vendors[key] < fewest:
+                fewest = vendors[key]
+                vendor_with_fewer = key
+        print(vendors)
         print("vendor ID: " + vendor_with_fewer)
         print("For that vendor, getting list of trips where drop-off occurred between 6pm and 6am in Brooklyn and determining the most popular drop off location")
         filtered_rides = []
