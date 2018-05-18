@@ -1,2 +1,5 @@
 data/
 venv/
+*.csv
+*.log
+metastore_db/

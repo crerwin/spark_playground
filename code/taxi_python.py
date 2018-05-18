@@ -34,14 +34,16 @@ def slow_join(filename):
             fields = line.rstrip().split(',')
             if fields[1] == '"Brooklyn"':
                 brooklyn_codes.append(fields[0])
-    print("brooklyn codes loaded.")
+    print(str(len(brooklyn_codes)) + " brooklyn codes loaded.")
     print("loading " + filename + " into memory")
     with open(filename) as f:
         content = f.readlines()
         del content[0]
         del content[0]
+        print(str(len(content)) + " lines in content")
         vendors = dict()
         print("getting vendor who transported fewer passengers on trips over 5 miles")
+        print(str(len(content)) + " lines in content")
         for line in content:
             fields = line.rstrip().split(',')
             vendorid = fields[0]
@@ -63,6 +65,7 @@ def slow_join(filename):
         print("For that vendor, getting list of trips where drop-off occurred between 6pm and 6am in Brooklyn and determining the most popular drop off location")
         filtered_rides = []
         drop_offs = dict()
+        print(str(len(content)) + " lines in content")
         for line in content:
             fields = line.rstrip().split(',')
             if vendor_with_fewer == fields[0]:
@@ -86,6 +89,12 @@ def slow_join(filename):
         total_trips = 0
         total_tips = 0.0
         total_revenue = 0.0
+        print("filtered_rides: " + str(len(filtered_rides)))
+        print("writing filtered rides to file")
+        fw = open("filtered.csv", "w+")
+        for line in filtered_rides:
+            fw.write(line)
+        fw.close()
         print("of trips with that drop off, getting credit card tips")
         for line in filtered_rides:
             fields = line.rstrip().split(',')
@@ -94,7 +103,7 @@ def slow_join(filename):
                 total_trips += 1
                 total_tips += float(fields[13])
                 total_revenue += float(fields[16])
-        print(total_tips/(total_revenue-total_tips))
+        print(total_trips, total_tips, total_revenue, total_tips/(total_revenue-total_tips))
 
 
 
