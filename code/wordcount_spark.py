@@ -9,9 +9,9 @@ def main(sc, filename):
     f = sc.textFile(filename)
     counts_rdd = f.flatMap(lambda line: line.split(" ")) \
         .filter(lambda w: len(w) > 0) \
-        .map(lambda word: (word, 1)) \
+        .map(lambda w: (w, 1)) \
         .reduceByKey(lambda a, b: a + b) \
-        .map(lambda x: (x[1], x[0])) \
+        .map(lambda w: (w[1], w[0])) \
         .sortByKey(False)
     word_counts = counts_rdd.collect()
     print(word_counts[0:20])

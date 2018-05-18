@@ -36,7 +36,7 @@ services:
     hostname: worker
     environment:
       SPARK_CONF_DIR: /conf
-      SPARK_WORKER_CORES: 2
+      SPARK_WORKER_CORES: 1
       SPARK_WORKER_MEMORY: 2g
       SPARK_WORKER_PORT: 8881
       SPARK_WORKER_WEBUI_PORT: 8081
@@ -51,7 +51,7 @@ services:
       - 7016
       - 8881
     ports:
-      - 8081-8084:8081
+      - 8081-8099:8081
     volumes:
       - ./conf/worker:/conf
       - ./data:/tmp/data
