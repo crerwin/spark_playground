@@ -42,7 +42,8 @@ def slow_join(filename):
         del content[0]
         print(str(len(content)) + " lines in content")
         vendors = dict()
-        print("getting vendor who transported fewer passengers on trips over 5 miles")
+        print("getting vendor who transported fewer"
+              + " passengers on trips over 5 miles")
         print(str(len(content)) + " lines in content")
         for line in content:
             fields = line.rstrip().split(',')
@@ -62,7 +63,9 @@ def slow_join(filename):
                 vendor_with_fewer = key
         print(vendors)
         print("vendor ID: " + vendor_with_fewer)
-        print("For that vendor, getting list of trips where drop-off occurred between 6pm and 6am in Brooklyn and determining the most popular drop off location")
+        print("For that vendor, getting list of trips where drop-off occurred"
+              + " between 6pm and 6am in Brooklyn and determining the most"
+              + " popular drop off location")
         filtered_rides = []
         drop_offs = dict()
         print(str(len(content)) + " lines in content")
@@ -71,8 +74,12 @@ def slow_join(filename):
             if vendor_with_fewer == fields[0]:
                 drop_off = fields[2]
                 drop_off_location_id = fields[8]
-                drop_off_time = datetime.datetime.strptime(drop_off, "%Y-%m-%d %H:%M:%S").time()
-                if drop_off_time > datetime.time(18) or drop_off_time < datetime.time(6):
+                drop_off_time = datetime.datetime.strptime(
+                                                    drop_off,
+                                                    "%Y-%m-%d %H:%M:%S"
+                                                  ).time()
+                if (drop_off_time > datetime.time(18)
+                        or drop_off_time < datetime.time(6)):
                     if drop_off_location_id in brooklyn_codes:
                         filtered_rides.append(line)
                         if drop_off_location_id in drop_offs:
@@ -85,7 +92,8 @@ def slow_join(filename):
             if drop_offs[key] > most_drop_offs:
                 most_drop_offs = drop_offs[key]
                 most_popular_drop_off_id = key
-        print("most popular drop off: " + most_popular_drop_off_id + " with " + str(most_drop_offs) + " drop offs.")
+        print("most popular drop off: " + most_popular_drop_off_id + " with "
+              + str(most_drop_offs) + " drop offs.")
         total_trips = 0
         total_tips = 0.0
         total_revenue = 0.0
@@ -103,9 +111,8 @@ def slow_join(filename):
                 total_trips += 1
                 total_tips += float(fields[13])
                 total_revenue += float(fields[16])
-        print(total_trips, total_tips, total_revenue, total_tips/(total_revenue-total_tips))
-
-
+        print(total_trips, total_tips, total_revenue,
+              total_tips/(total_revenue-total_tips))
 
 
 def revenue_by_vendor(filename):
