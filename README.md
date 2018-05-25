@@ -81,10 +81,15 @@ You can get the complete works of Shakespeare in a text file from `https://ocw.m
 wget https://ocw.mit.edu/ans7870/6/6.006/s08/lecturenotes/files/t8.shakespeare.txt
 ```
 
-Run the code to get the 20 most common words:
+Run the pure python code to get the 20 most common words:
+```
+python code/wordcount_python.py data/t8.shakespeare.txt
+```
+
+Then run the equivalent Spark implementation:
 
 ```
-docker run --rm -it -v $(pwd)/code:/tmp/code -v $(pwd)/data:/tmp/data gettyimages/spark bin/spark-submit /tmp/code/wordcount_spark.py /tmp/data/shakespeare.txt
+docker run --rm -it -v $(pwd)/code:/tmp/code -v $(pwd)/data:/tmp/data gettyimages/spark bin/spark-submit /tmp/code/wordcount_spark.py /tmp/data/t8.shakespeare.txt
 ```
 
 # Taxis
@@ -158,7 +163,11 @@ Look through `code/taxi_python.py` and `code/taxi_spark.py` for individual
 function names.  Execute like so:
 
 ```
-spark-submit code/taxi_python.py revenue_by_vendor data/taxi.csv
+python code/taxi_python.py revenue_by_vendor data/taxi.csv
+```
+
+```
+docker run --rm -it -v $(pwd)/code:/tmp/code -v $(pwd)/data:/tmp/data gettyimages/spark bin/spark-submit /tmp/code/taxi_spark.py revenue_by_vendor /tmp/data/taxi.csv
 ```
 
 All functions except `slow_join` need to run through the data once, so the
