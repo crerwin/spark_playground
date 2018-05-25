@@ -84,22 +84,27 @@ wget https://ocw.mit.edu/ans7870/6/6.006/s08/lecturenotes/files/t8.shakespeare.t
 Run the code to get the 20 most common words:
 
 ```
-docker run --rm -it -p 4040:4040 -v $(pwd)/code:/tmp/code -v $(pwd)/data:/tmp/data gettyimages/spark bin/spark-submit /tmp/code/wordcount_spark.py /tmp/data/shakespeare.txt
+docker run --rm -it -v $(pwd)/code:/tmp/code -v $(pwd)/data:/tmp/data gettyimages/spark bin/spark-submit /tmp/code/wordcount_spark.py /tmp/data/shakespeare.txt
 ```
 
 # Taxis
 
+This deals with tabular data and some relational aspects of the data, which is
+well suited for SQL.  Spark has some SQL-like functionality built in.
+
 ## Getting the data
 Download `https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2017-01.csv`
 or any other yellow taxi csv from http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml
+and put it into `data/`.  You'll also need `https://s3.amazonaws.com/nyc-tlc/misc/taxi+_zone_lookup.csv`.
 
-For ease of typing, let's change the file name:
+For ease of typing, let's change the file names:
 
 ```
 mv yellow_tripdata_2017-01.csv taxi.csv
+mv taxi+_zone_lookup.csv taxi_zone_lookup.csv
 ```
 
-Two fun aspects of these files is that a) they have blank lines on the second line and b) they use \r\n line endings.  Python and Spark don't care (and the example code here has been written to expect them), but if you want to load the data into Postgres it's easiest to create a fixed file (will take a minute or so):
+Two fun aspects of these tripdata files is that a) they have blank lines on the second line and b) they use \r\n line endings.  Python and Spark don't care (and the example code here has been written to expect them), but if you want to load the data into Postgres it's easiest to create a fixed file (will take a minute or so):
 
 ```
 sed '/^.$/d' taxi.csv | tr -d '\r' > taxi_fixed_for_postgres.csv
@@ -118,10 +123,54 @@ head -n 10 taxi.csv | od -c
 head -n 10 taxi_fixed_for_postgres.csv | od -c
 ```
 
+## Loading into Postgres
+If, like me, you're more comfortable working with data in SQL, you can load this
+data into Postgres to poke and prod it before comparing the Python and Spark
+implementations.  First, spin up a Postgres instance:
+
+```
+docker-compose -f docker-compose-postgres.yml -d
+```
+
+Then connect with psql from the psql container:
+
+```
+docker exec -it spark_playground_psql_1 psql -h postgres -U postgres
+```
+
+The password is `pw` (changeable in the compose file).  To quit psql, type `\q`
+and press enter.
+
+Once in psql, you can load the taxi data into a new database:
+
+```
+\i /tmp/code/postgres_init.sql
+```
+
+The rest of the details of querying the data in Postgres is up to you and the
+Postgres docs.
+
+Change that sql file within this repository if you're using data other than
+`yellow_tripdata_2017-01.csv`.
+
+## Simple once-through functions.
+Look through `code/taxi_python.py` and `code/taxi_spark.py` for individual
+function names.  Execute like so:
+
+```
+spark-submit code/taxi_python.py revenue_by_vendor data/taxi.csv
+```
+
+All functions except `slow_join` need to run through the data once, so the
+overall execution times don't vary too much.  Python takes in the area of 10
+seconds to run through the data from the file on my laptop.  The actual
+computation within Spark, running locally with 1 executor
+
 
 Slow join:
-```
-for the vendor who transported fewer passengers on all trips over 5 miles,
-what is the average tip percentage for credit card tips (payment type: 1, tip/total_amount-tip)
-for trips where the drop-off occurred between 6pm and 6am in Brooklyn.
-```
+* Find the vendor who transported fewer passengers for trips over 5 miles.
+* Find the most popular overall drop off location in Brooklyn
+* For the above-determined vendor, calculate the average tip percentage for
+credit card tips for trips where the drop off time is between 6pm and 6am,
+at the above-determined location.  Tip percentage being
+tip_amount/(total_amount-tip_amount).  Credit card payments are payment type 1.
